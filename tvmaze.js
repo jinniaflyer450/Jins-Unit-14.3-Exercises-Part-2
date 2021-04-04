@@ -22,15 +22,22 @@ async function searchShows(query) {
    let shows = search.data;
    let showList = [];
    for(let showData of shows){
-     if(showData.show.image.medium){
-      let show = 
-      showList.push(show);
+     if(showData.show.image){
+       if(showData.show.image.medium){
+        let show = {'id': showData.show.id, 'name': showData.show.name, 'summary': showData.show.summary, 'image': showData.show.image.medium};
+        showList.push(show);
+       }
+       else{
+         let show = {'id': showData.show.id, 'name': showData.show.name, 'summary': showData.show.summary, 'image': 'https://github.com/jinniaflyer450/Jins-Unit-14.3-Exercises-Part-2/blob/master/no_image.png?raw=true'};
+         showList.push(show);
+       }
+
      }
      else{
-       let show = {'id': showData.show.id, 'name': showData.show.name, 'summary': showData.show.summary, 'image': }
+       let show = {'id': showData.show.id, 'name': showData.show.name, 'summary': showData.show.summary, 'image': 'https://github.com/jinniaflyer450/Jins-Unit-14.3-Exercises-Part-2/blob/master/no_image.png?raw=true'}
+       showList.push(show);
      }
    }
-   console.log(showList);
    return showList;
 }
 
@@ -86,6 +93,13 @@ $("#search-form").on("submit", async function handleSearch (evt) {
  */
 
 async function getEpisodes(id) {
+  let episodes = await axios.get(`http://api.tvmaze.com/shows/${id}/episodes`)
+  let episodeList = [];
+  for(episode of episodes.data){
+    let episodeData = {'id': episode.id, 'name': episode.name, 'season': episode.season, 'number': episode.number};
+    episodeList.push(episodeData);
+  }
+  return episodeList;
   // TODO: get episodes from tvmaze
   //       you can get this by making GET request to
   //       http://api.tvmaze.com/shows/SHOW-ID-HERE/episodes
