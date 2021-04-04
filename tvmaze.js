@@ -1,32 +1,17 @@
-/** Given a query string, return array of matching shows:
- *     { id, name, summary, episodesUrl }
- */
+//Citations
+//The TV Maze API, of course: http://api.tvmaze.com/
+// Figured out how to use the parent function here. https://api.jquery.com/parent/
+//Figured out to add parentheses here. https://www.w3schools.com/jquery/event_target.asp
+//Figured out I needed parentheses here. https://stackoverflow.com/questions/9766171/how-to-get-event-targets-parent-with-jquery/9766441
+// Reviewed append here https://api.jquery.com/append/#append-content-content
 
-
-/** Search Shows
- *    - given a search term, search for tv shows that
- *      match that query.  The function is async show it
- *       will be returning a promise.
- *
- *   - Returns an array of objects. Each object should include
- *     following show information:
- *    {
-        id: <show id>,
-        name: <show name>,
-        summary: <show summary>,
-        image: <an image from the show data, or a default imege if no image exists, (image isn't needed until later)>
-      }
- */
-
-      // Figured out how to use the parent function here. https://api.jquery.com/parent/
-      //Figured out to add parentheses here. https://www.w3schools.com/jquery/event_target.asp
-      //Figured out I needed parentheses here. https://stackoverflow.com/questions/9766171/how-to-get-event-targets-parent-with-jquery/9766441
-      // Reviewed append here https://api.jquery.com/append/#append-content-content
+//Gets show data that matches a particular query from the TV Maze API.
 async function searchShows(query) {
    let search = await axios.get('http://api.tvmaze.com/search/shows', {'params': {'q': query}});
    let shows = search.data;
    let showList = [];
    for(let showData of shows){
+     //This series of ifs and elses accounts for shows that do not have images in the exact place most shows do.
      if(showData.show.image){
        if(showData.show.image.medium){
         let show = {'id': showData.show.id, 'name': showData.show.name, 'summary': showData.show.summary, 'image': showData.show.image.medium};
@@ -36,7 +21,6 @@ async function searchShows(query) {
          let show = {'id': showData.show.id, 'name': showData.show.name, 'summary': showData.show.summary, 'image': 'https://github.com/jinniaflyer450/Jins-Unit-14.3-Exercises-Part-2/blob/master/no_image.png?raw=true'};
          showList.push(show);
        }
-
      }
      else{
        let show = {'id': showData.show.id, 'name': showData.show.name, 'summary': showData.show.summary, 'image': 'https://github.com/jinniaflyer450/Jins-Unit-14.3-Exercises-Part-2/blob/master/no_image.png?raw=true'}
@@ -46,12 +30,7 @@ async function searchShows(query) {
    return showList;
 }
 
-
-
-/** Populate shows list:
- *     - given list of shows, add shows to DOM
- */
-
+//This function makes sure the relevant show data collected in searchShows shows up in the DOM.
 function populateShows(shows) {
   const $showsList = $("#shows-list");
   $showsList.empty();
@@ -74,11 +53,7 @@ function populateShows(shows) {
   }
 }
 
-
-/** Handle search form submission:
- *    - hide episodes area
- *    - get list of matching shows and show in shows list
- */
+//This event listener connects submission of the search form to appearance of the requested data.
 
 $("#search-form").on("submit", async function handleSearch (evt) {
   evt.preventDefault();
@@ -91,6 +66,7 @@ $("#search-form").on("submit", async function handleSearch (evt) {
   populateShows(shows);
 })
 
+//If a person requests episodes, the app will retrieve episode data from the TV Maze API using this function.
 async function getEpisodes(id) {
   let episodes = await axios.get(`http://api.tvmaze.com/shows/${id}/episodes`)
   let episodeList = [];
@@ -101,6 +77,8 @@ async function getEpisodes(id) {
   return episodeList;
 }
 
+
+//If a person requests episodes, the app will make sure the episodes show up in the DOM using this function.
 async function populateEpisodes(episodeList){
   const $episodeArea = $('#episodes-list');
   $episodeArea.empty();
@@ -110,6 +88,7 @@ async function populateEpisodes(episodeList){
   }
 }
 
+//This event listener links the clicking of a "Add episodes" button to the episode data showing up in the DOM.
 $('#shows-list').on('click', '.add-episodes', async function(evt){
   evt.preventDefault();
   $('#episodes-area').show();
