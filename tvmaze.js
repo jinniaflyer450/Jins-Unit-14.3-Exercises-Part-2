@@ -17,6 +17,11 @@
         image: <an image from the show data, or a default imege if no image exists, (image isn't needed until later)>
       }
  */
+
+      // Figured out how to use the parent function here. https://api.jquery.com/parent/
+      //Figured out to add parentheses here. https://www.w3schools.com/jquery/event_target.asp
+      //Figured out I needed parentheses here. https://stackoverflow.com/questions/9766171/how-to-get-event-targets-parent-with-jquery/9766441
+      // Reviewed append here https://api.jquery.com/append/#append-content-content
 async function searchShows(query) {
    let search = await axios.get('http://api.tvmaze.com/search/shows', {'params': {'q': query}});
    let shows = search.data;
@@ -59,6 +64,7 @@ function populateShows(shows) {
            <img class = "card-img-top" src = "${show.image}">
              <h5 class="card-title">${show.name}</h5>
              <p class="card-text">${show.summary}</p>
+             <button class = "card-btn add-episodes">Click for Episodes</button>
            </div>
          </div>
        </div>
@@ -80,29 +86,36 @@ $("#search-form").on("submit", async function handleSearch (evt) {
   let query = $("#search-query").val();
   if (!query) return;
 
-  $("#episodes-area").hide();
-
   let shows = await searchShows(query);
-
+  $('#episodes-area').hide();
   populateShows(shows);
-});
-
-
-/** Given a show ID, return list of episodes:
- *      { id, name, season, number }
- */
+})
 
 async function getEpisodes(id) {
   let episodes = await axios.get(`http://api.tvmaze.com/shows/${id}/episodes`)
   let episodeList = [];
-  for(episode of episodes.data){
+  for(let episode of episodes.data){
     let episodeData = {'id': episode.id, 'name': episode.name, 'season': episode.season, 'number': episode.number};
     episodeList.push(episodeData);
   }
   return episodeList;
-  // TODO: get episodes from tvmaze
-  //       you can get this by making GET request to
-  //       http://api.tvmaze.com/shows/SHOW-ID-HERE/episodes
-
-  // TODO: return array-of-episode-info, as described in docstring above
 }
+
+async function populateEpisodes(episodeList){
+  const $episodeArea = $('#episodes-list');
+  $episodeArea.empty();
+  for(let episode of episodeList){
+    let $item = $(`<li>${episode.name} (Season ${episode.season}, Episode ${episode.number})</li>`)
+    $episodeArea.append($item);
+  }
+}
+
+$('#shows-list').on('click', '.add-episodes', async function(evt){
+  evt.preventDefault();
+  $('#episodes-area').show();
+  let id = $(evt.target).parent().parent().attr('data-show-id');
+  console.log(id);
+  let episodeList = await getEpisodes(id);
+  console.log(episodeList);
+  await populateEpisodes(episodeList);
+})
