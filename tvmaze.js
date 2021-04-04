@@ -22,9 +22,13 @@ async function searchShows(query) {
    let shows = search.data;
    let showList = [];
    for(let showData of shows){
-     let show = {'id': showData.show.id, 'name': showData.show.name, 'summary': showData.show.summary, 'image': showData.show.image.medium}
-     console.log(show);
-     showList.push(show);
+     if(showData.show.image.medium){
+      let show = 
+      showList.push(show);
+     }
+     else{
+       let show = {'id': showData.show.id, 'name': showData.show.name, 'summary': showData.show.summary, 'image': }
+     }
    }
    console.log(showList);
    return showList;
